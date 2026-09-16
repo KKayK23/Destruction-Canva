@@ -1,0 +1,1765 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>破壞藝術 Destruction Canva</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #241f19;
+      --line: rgba(36, 31, 25, 0.24);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+      background: #fff;
+    }
+
+    body {
+      font-family: Georgia, "Times New Roman", "Noto Serif TC", serif;
+      color: var(--ink);
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      cursor: none;
+      touch-action: none;
+    }
+
+    .hint {
+      position: fixed;
+      left: 50%;
+      bottom: max(30px, env(safe-area-inset-bottom));
+      z-index: 2;
+      margin: 0;
+      transform: translateX(-50%);
+      font-size: 15px;
+      letter-spacing: 0;
+      white-space: nowrap;
+      pointer-events: none;
+      transition: opacity 700ms ease, transform 700ms ease;
+    }
+
+    .hint.hidden {
+      opacity: 0;
+      transform: translate(-50%, 10px);
+    }
+
+    .brand {
+      position: fixed;
+      top: max(21px, calc(env(safe-area-inset-top) + 3px));
+      left: max(20px, env(safe-area-inset-left));
+      z-index: 3;
+      display: grid;
+      gap: 4px;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .brand-zh {
+      font-size: 17px;
+      letter-spacing: 0.42em;
+      white-space: nowrap;
+    }
+
+    .brand-en {
+      font-size: 10.5px;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      opacity: 0.55;
+      white-space: nowrap;
+    }
+
+    @media (max-width: 619px) {
+      .brand-zh {
+        font-size: 15px;
+      }
+
+      .brand-en {
+        font-size: 9.5px;
+      }
+
+      .mode {
+        padding: 8px 9px;
+        font-size: 12.5px;
+      }
+
+      .modes {
+        left: max(12px, env(safe-area-inset-left));
+      }
+
+      .hint {
+        bottom: calc(max(20px, env(safe-area-inset-bottom)) + 56px);
+      }
+
+      .credit {
+        bottom: calc(max(20px, env(safe-area-inset-bottom)) + 58px);
+        font-size: 9.5px;
+      }
+    }
+
+    @media (min-width: 620px) {
+      .hint {
+        bottom: calc(max(20px, env(safe-area-inset-bottom)) + 34px);
+      }
+
+      .hint.hidden {
+        transform: translate(-50%, 10px);
+      }
+    }
+
+    .reset {
+      position: fixed;
+      top: max(18px, env(safe-area-inset-top));
+      right: max(18px, env(safe-area-inset-right));
+      z-index: 3;
+      display: grid;
+      width: 42px;
+      height: 42px;
+      padding: 0;
+      place-items: center;
+      color: var(--ink);
+      background: rgba(255, 255, 255, 0.88);
+      border: 1px solid var(--line);
+      border-radius: 50%;
+      cursor: pointer;
+      backdrop-filter: blur(8px);
+    }
+
+    .reset:hover {
+      background: #fff;
+    }
+
+    .reset:focus-visible {
+      outline: 2px solid var(--ink);
+      outline-offset: 3px;
+    }
+
+    .reset svg {
+      width: 19px;
+      height: 19px;
+      fill: none;
+      stroke: currentColor;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-width: 1.8;
+    }
+
+    .export {
+      position: fixed;
+      top: max(18px, env(safe-area-inset-top));
+      right: calc(max(18px, env(safe-area-inset-right)) + 52px);
+      z-index: 3;
+      display: grid;
+      width: 42px;
+      height: 42px;
+      padding: 0;
+      place-items: center;
+      color: var(--ink);
+      background: rgba(255, 255, 255, 0.88);
+      border: 1px solid var(--line);
+      border-radius: 50%;
+      cursor: pointer;
+      backdrop-filter: blur(8px);
+    }
+
+    .export:hover {
+      background: #fff;
+    }
+
+    .export:focus-visible {
+      outline: 2px solid var(--ink);
+      outline-offset: 3px;
+    }
+
+    .export svg {
+      width: 19px;
+      height: 19px;
+      fill: none;
+      stroke: currentColor;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-width: 1.8;
+    }
+
+    .upload {
+      position: fixed;
+      top: max(18px, env(safe-area-inset-top));
+      right: calc(max(18px, env(safe-area-inset-right)) + 104px);
+      z-index: 3;
+      display: grid;
+      width: 42px;
+      height: 42px;
+      padding: 0;
+      place-items: center;
+      color: var(--ink);
+      background: rgba(255, 255, 255, 0.88);
+      border: 1px solid var(--line);
+      border-radius: 50%;
+      cursor: pointer;
+      backdrop-filter: blur(8px);
+    }
+
+    .upload:hover {
+      background: #fff;
+    }
+
+    .upload:focus-visible {
+      outline: 2px solid var(--ink);
+      outline-offset: 3px;
+    }
+
+    .upload svg {
+      width: 19px;
+      height: 19px;
+      fill: none;
+      stroke: currentColor;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-width: 1.8;
+    }
+
+    .drop-overlay {
+      position: fixed;
+      inset: 14px;
+      z-index: 8;
+      display: grid;
+      place-items: center;
+      color: var(--ink);
+      font-size: 15px;
+      letter-spacing: 0.14em;
+      background: rgba(255, 255, 255, 0.72);
+      border: 1.5px dashed rgba(36, 31, 25, 0.45);
+      border-radius: 18px;
+      backdrop-filter: blur(4px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 180ms ease;
+    }
+
+    .drop-overlay.visible {
+      opacity: 1;
+    }
+
+    .modes {
+      position: fixed;
+      top: 50%;
+      left: max(20px, env(safe-area-inset-left));
+      z-index: 3;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding: 0;
+      background: none;
+      border: 0;
+      transform: translateY(-50%);
+    }
+
+    .mode {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 2px;
+      padding: 2px 0;
+      border: 0;
+      background: none;
+      font: inherit;
+      font-size: 13.5px;
+      letter-spacing: 0.1em;
+      color: var(--ink);
+      opacity: 0.4;
+      cursor: pointer;
+    }
+
+    .mode span {
+      font-size: 10px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    .mode:hover {
+      opacity: 0.85;
+    }
+
+    .mode.active {
+      opacity: 1;
+      font-weight: 700;
+      text-decoration: underline;
+      text-underline-offset: 4px;
+      text-decoration-thickness: 1.5px;
+    }
+
+    .mode:focus-visible {
+      outline: 2px solid var(--ink);
+      outline-offset: 2px;
+    }
+
+    .export-menu {
+      position: fixed;
+      top: calc(max(18px, env(safe-area-inset-top)) + 52px);
+      right: max(18px, env(safe-area-inset-right));
+      z-index: 5;
+      min-width: 148px;
+      padding: 6px;
+      background: rgba(255, 255, 255, 0.94);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      box-shadow: 0 14px 32px rgba(35, 27, 18, 0.16);
+      backdrop-filter: blur(8px);
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-6px);
+      transition: opacity 200ms ease, transform 200ms ease, visibility 200ms;
+    }
+
+    .export-menu.open {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    .export-menu button {
+      display: flex;
+      width: 100%;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 9px 11px;
+      border: 0;
+      border-radius: 9px;
+      background: none;
+      font: inherit;
+      font-size: 13px;
+      letter-spacing: 0.06em;
+      color: var(--ink);
+      cursor: pointer;
+    }
+
+    .export-menu button span {
+      font-size: 11px;
+      opacity: 0.55;
+    }
+
+    .export-menu button:hover,
+    .export-menu button:focus-visible {
+      background: rgba(36, 31, 25, 0.07);
+      outline: none;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: calc(max(20px, env(safe-area-inset-bottom)) + 60px);
+      z-index: 6;
+      padding: 9px 18px;
+      font-size: 13px;
+      letter-spacing: 0.08em;
+      color: var(--ink);
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      box-shadow: 0 10px 26px rgba(35, 27, 18, 0.12);
+      opacity: 0;
+      transform: translate(-50%, 10px);
+      pointer-events: none;
+      transition: opacity 320ms ease, transform 320ms ease;
+    }
+
+    .toast.visible {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+
+    .brush-cursor {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 4;
+      width: clamp(52px, 8vw, 80px);
+      height: clamp(52px, 8vw, 80px);
+      border: 1px solid rgba(255, 255, 255, 0.86);
+      border-radius: 50%;
+      box-shadow: 0 0 0 1px rgba(36, 31, 25, 0.28);
+      opacity: 0;
+      pointer-events: none;
+      transform: translate(-50%, -50%);
+    }
+
+    .brush-cursor.glitch {
+      border-style: dashed;
+      border-radius: 4px;
+      width: 38px;
+      height: 38px;
+      border-color: rgba(36, 31, 25, 0.55);
+    }
+
+    .credit {
+      position: fixed;
+      right: max(20px, env(safe-area-inset-right));
+      bottom: max(18px, env(safe-area-inset-bottom));
+      z-index: 3;
+      font-size: 10.5px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--ink);
+      opacity: 0.45;
+      pointer-events: none;
+      user-select: none;
+      white-space: nowrap;
+    }
+
+    @media (pointer: coarse) {
+      canvas,
+      .brush-cursor {
+        cursor: auto;
+      }
+
+      .brush-cursor {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="artwork" aria-label="可用滑鼠推動顏料的互動畫作"></canvas>
+  <header class="brand" aria-label="破壞藝術 Destruction Canva">
+    <span class="brand-zh">破壞藝術</span>
+    <span class="brand-en">Destruction Canva</span>
+  </header>
+  <nav class="modes" aria-label="破壞手法切換">
+    <button class="mode active" id="modeSmear" type="button" aria-pressed="true">抹開 <span>Smear</span></button>
+    <button class="mode" id="modeRGBSplit" type="button" aria-pressed="false">色差 <span>RGB Split</span></button>
+    <button class="mode" id="modeGlitch" type="button" aria-pressed="false">數位 <span>Glitch</span></button>
+    <button class="mode" id="modeMelt" type="button" aria-pressed="false">融化 <span>Melt</span></button>
+  </nav>
+  <p class="hint" id="hint">移動或長按，攪動畫面</p>
+  <input type="file" id="uploadInput" accept="image/*" hidden>
+  <button class="upload" id="upload" type="button" aria-label="上傳圖片" title="上傳圖片（也可拖放或貼上）">
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M12 14V4"></path>
+      <path d="m8 8 4-4 4 4"></path>
+      <path d="M4 16v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"></path>
+    </svg>
+  </button>
+  <button class="export" id="export" type="button" aria-label="匯出畫作" title="匯出畫作" aria-haspopup="menu" aria-expanded="false">
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M12 4v11"></path>
+      <path d="m7 11 5 5 5-5"></path>
+      <path d="M5 20h14"></path>
+    </svg>
+  </button>
+  <div class="export-menu" id="exportMenu" role="menu" aria-label="選擇匯出格式">
+    <button type="button" role="menuitem" data-format="png">PNG <span>無損</span></button>
+    <button type="button" role="menuitem" data-format="jpg">JPG <span>檔案較小</span></button>
+  </div>
+  <button class="reset" id="reset" type="button" aria-label="重置畫作" title="重置畫作">
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M3 12a9 9 0 1 0 3-6.7L3 8"></path>
+      <path d="M3 3v5h5"></path>
+    </svg>
+  </button>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <div class="drop-overlay" id="dropOverlay" aria-hidden="true">放開滑鼠，載入圖片</div>
+  <footer class="credit" aria-hidden="true">Created by Kay Liang</footer>
+  <span class="brush-cursor" id="brushCursor" aria-hidden="true"></span>
+
+  <script>
+    const canvas = document.querySelector("#artwork");
+    const context = canvas.getContext("2d", { alpha: false });
+    const hint = document.querySelector("#hint");
+    let hintFadeTimer = null;
+    const resetButton = document.querySelector("#reset");
+    const brushCursor = document.querySelector("#brushCursor");
+    const exportButton = document.querySelector("#export");
+    const exportMenu = document.querySelector("#exportMenu");
+    const uploadButton = document.querySelector("#upload");
+    const uploadInput = document.querySelector("#uploadInput");
+    const dropOverlay = document.querySelector("#dropOverlay");
+    const toast = document.querySelector("#toast");
+    const modeSmearButton = document.querySelector("#modeSmear");
+    const modeGlitchButton = document.querySelector("#modeGlitch");
+    const modeRGBSplitButton = document.querySelector("#modeRGBSplit");
+    const modeMeltButton = document.querySelector("#modeMelt");
+    const sourceImage = new Image();
+
+    const originalCanvas = document.createElement("canvas");
+    const originalContext = originalCanvas.getContext("2d", { alpha: false });
+    const brushCanvas = document.createElement("canvas");
+    const brushContext = brushCanvas.getContext("2d");
+    // Glitch 手法：區域像素處理緩衝（保留透明度，才能做柔邊烘焙）
+    const glitchCanvas = document.createElement("canvas");
+    const glitchContext = glitchCanvas.getContext("2d", { willReadFrequently: true });
+    const pointer = {
+      x: 0,
+      y: 0,
+      previousX: 0,
+      previousY: 0,
+      active: false,
+      carryingPaint: false,
+      down: false,
+      pressX: 0,
+      pressY: 0,
+      pressedAt: 0,
+      longPressEligible: false,
+      lastVortexFrame: 0
+    };
+    // 預設畫作會裁除四周白邊；上傳圖片則於載入時重新計算。
+    let sourceRect = { x: 170, y: 82, width: 682, height: 840 };
+    const trimCanvas = document.createElement("canvas");
+    const trimContext = trimCanvas.getContext("2d", { willReadFrequently: true });
+
+    let pixelRatio = 1;
+    let artworkRect = { x: 0, y: 0, width: 0, height: 0 };
+    let hasInteracted = false;
+    let activeMode = "smear";
+    // Glitch 手法：掃動佇列與速度能量
+    const glitchQueue = [];
+    const glitchTrail = { lastX: 0, lastY: 0, hasPoint: false };
+    let glitchEnergy = 0;
+    let glitchLastMoveAt = 0;
+    let glitchSource = null;
+    const MODE_HINTS = {
+      smear: "移動滑鼠，攪動畫面",
+      rgbsplit: "掃過畫面，拉出色差",
+      glitch: "點擊畫面，隨機數位損壞",
+      melt: "長按畫面，顏料融化滴落"
+    };
+    // Melt 手法：融化緩衝與節流
+    const meltCanvas = document.createElement("canvas");
+    const meltContext = meltCanvas.getContext("2d", { willReadFrequently: true });
+    const meltSource = document.createElement("canvas");
+    const meltSourceContext = meltSource.getContext("2d");
+    let lastMeltFrame = 0;
+    let meltPressStart = 0;
+    const meltDrip = { active: false, tipY: 0, x: 0, y: 0 };
+
+    function fitArtwork() {
+      const viewportWidth = window.innerWidth;
+      const viewportHeight = window.innerHeight;
+      const isCompact = Math.min(viewportWidth, viewportHeight) < 620;
+      const margin = isCompact ? 16 : 24;
+      const availableWidth = viewportWidth - margin * 2;
+      const availableHeight = isCompact
+        ? viewportHeight - margin * 2
+        : viewportHeight * 0.78;
+      const scale = Math.min(availableWidth / sourceRect.width, availableHeight / sourceRect.height);
+      const width = sourceRect.width * scale;
+      const height = sourceRect.height * scale;
+
+      artworkRect = {
+        x: (viewportWidth - width) / 2,
+        y: (viewportHeight - height) / 2,
+        width,
+        height
+      };
+    }
+
+    function drawBackground(targetContext) {
+      const width = canvas.width / pixelRatio;
+      const height = canvas.height / pixelRatio;
+      targetContext.fillStyle = "#fff";
+      targetContext.fillRect(0, 0, width, height);
+
+      targetContext.save();
+      targetContext.shadowColor = "rgba(35, 27, 18, 0.2)";
+      targetContext.shadowBlur = 24;
+      targetContext.shadowOffsetY = 10;
+      targetContext.drawImage(
+        sourceImage,
+        sourceRect.x,
+        sourceRect.y,
+        sourceRect.width,
+        sourceRect.height,
+        artworkRect.x,
+        artworkRect.y,
+        artworkRect.width,
+        artworkRect.height
+      );
+      targetContext.restore();
+    }
+
+    function resetArtwork() {
+      if (!originalCanvas.width) return;
+      context.save();
+      context.setTransform(1, 0, 0, 1, 0, 0);
+      context.globalAlpha = 1;
+      context.drawImage(originalCanvas, 0, 0);
+      context.restore();
+      pointer.active = false;
+      pointer.carryingPaint = false;
+      pointer.down = false;
+      pointer.longPressEligible = false;
+      glitchQueue.length = 0;
+      glitchTrail.hasPoint = false;
+      glitchEnergy = 0;
+      hasInteracted = false;
+      hint.classList.remove("hidden");
+    }
+
+    function resizeCanvas() {
+      pixelRatio = Math.min(window.devicePixelRatio || 1, 1.5);
+      canvas.width = Math.round(window.innerWidth * pixelRatio);
+      canvas.height = Math.round(window.innerHeight * pixelRatio);
+      context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+
+      originalCanvas.width = canvas.width;
+      originalCanvas.height = canvas.height;
+      originalContext.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+      fitArtwork();
+      drawBackground(originalContext);
+      resetArtwork();
+    }
+
+    function isInsideArtwork(x, y) {
+      return x >= artworkRect.x && x <= artworkRect.x + artworkRect.width
+        && y >= artworkRect.y && y <= artworkRect.y + artworkRect.height;
+    }
+
+    function mixPaint(x, y, directionX, directionY, speed) {
+      const radius = Math.max(26, Math.min(40, artworkRect.width * 0.05));
+      const diameter = Math.ceil(radius * 2);
+      const sourceX = Math.round((x - radius) * pixelRatio);
+      const sourceY = Math.round((y - radius) * pixelRatio);
+      const sourceSize = Math.round(diameter * pixelRatio);
+
+      if (sourceX < 0 || sourceY < 0 || sourceX + sourceSize > canvas.width || sourceY + sourceSize > canvas.height) {
+        return;
+      }
+
+      brushCanvas.width = sourceSize;
+      brushCanvas.height = sourceSize;
+      brushContext.setTransform(1, 0, 0, 1, 0, 0);
+      brushContext.clearRect(0, 0, sourceSize, sourceSize);
+      brushContext.drawImage(canvas, sourceX, sourceY, sourceSize, sourceSize, 0, 0, sourceSize, sourceSize);
+
+      const length = Math.hypot(directionX, directionY) || 1;
+      const offset = Math.min(8, 2 + speed * 0.18);
+      const offsetX = directionX / length * offset;
+      const offsetY = directionY / length * offset;
+      const blendBlur = Math.min(3, 1.5 + speed * 0.03);
+
+      context.save();
+      context.beginPath();
+      context.arc(x, y, radius, 0, Math.PI * 2);
+      context.clip();
+      context.globalAlpha = 0.16;
+
+      for (let layer = 1; layer <= 2; layer += 1) {
+        const drift = layer / 2;
+        context.drawImage(
+          brushCanvas,
+          x - radius + offsetX * drift,
+          y - radius + offsetY * drift,
+          diameter,
+          diameter
+        );
+      }
+
+      context.globalAlpha = 0.07;
+      context.filter = `blur(${blendBlur}px)`;
+      context.drawImage(
+        brushCanvas,
+        x - radius + offsetX * 0.75,
+        y - radius + offsetY * 0.75,
+        diameter,
+        diameter
+      );
+
+      context.restore();
+    }
+
+    function swirlPaint(x, y, heldFor) {
+      const baseRadius = Math.max(30, Math.min(42, artworkRect.width * 0.06));
+      const radius = Math.min(baseRadius + 34, baseRadius + Math.max(0, heldFor - 500) * 0.014);
+      const diameter = Math.ceil(radius * 2);
+      const sourceX = Math.round((x - radius) * pixelRatio);
+      const sourceY = Math.round((y - radius) * pixelRatio);
+      const sourceSize = Math.round(diameter * pixelRatio);
+
+      if (sourceX < 0 || sourceY < 0 || sourceX + sourceSize > canvas.width || sourceY + sourceSize > canvas.height) {
+        return;
+      }
+
+      brushCanvas.width = sourceSize;
+      brushCanvas.height = sourceSize;
+      brushContext.setTransform(1, 0, 0, 1, 0, 0);
+      brushContext.clearRect(0, 0, sourceSize, sourceSize);
+      brushContext.drawImage(canvas, sourceX, sourceY, sourceSize, sourceSize, 0, 0, sourceSize, sourceSize);
+
+      context.save();
+      context.beginPath();
+      context.arc(x, y, radius, 0, Math.PI * 2);
+      context.clip();
+      context.translate(x, y);
+      context.rotate(0.112);
+      context.globalAlpha = 0.16;
+      context.filter = "blur(0.5px)";
+      context.drawImage(brushCanvas, -radius, -radius, diameter, diameter);
+      context.restore();
+    }
+
+    // Melt 手法：長按時顏料像水流一樣從按壓點向下流動、流出圓圈，放開即停止
+    // 做法：按壓時從 originalCanvas 快取一條完整的顏料柱（按壓點到畫作底部），
+    // 每幀把快取柱的 [0..travel] 段 1:1 畫出來——顏色連續、無條紋，像水一樣流出圓圈
+    function meltPaint(x, y) {
+      const radius = Math.max(30, Math.min(48, artworkRect.width * 0.065));
+      const stripWidth = radius * 1.15;
+
+      // 按壓開始時初始化水滴尖端，並快取完整的原始顏料柱
+      if (!meltDrip.active) {
+        meltDrip.active = true;
+        meltDrip.tipY = y + radius * 0.4;
+        meltDrip.x = x;
+        meltDrip.y = y;
+        meltDrip.travel = 0;
+        const cacheX = Math.round((x - stripWidth / 2) * pixelRatio);
+        const cacheW = Math.round(stripWidth * pixelRatio);
+        const cacheY = Math.round(y * pixelRatio);
+        const cacheH = Math.round((window.innerHeight - y) * pixelRatio);
+        meltSource.width = cacheW;
+        meltSource.height = cacheH;
+        meltSourceContext.setTransform(1, 0, 0, 1, 0, 0);
+        meltSourceContext.clearRect(0, 0, cacheW, cacheH);
+        // 從當前畫面取色：如果畫作上已有其他手法的痕跡，也會一併被融化流下來
+        meltSourceContext.drawImage(canvas, cacheX, cacheY, cacheW, cacheH, 0, 0, cacheW, cacheH);
+        // 計算按壓點的主色，之後用來做水流的飽和底色（原圖同位置顏色會讓水流隱形，需要加深）
+        const swatch = meltSourceContext.getImageData(0, 0, cacheW, Math.min(cacheH, Math.round(radius * 0.8 * pixelRatio))).data;
+        let r = 0, g = 0, b = 0, count = 0;
+        for (let i = 0; i < swatch.length; i += 4) {
+          r += swatch[i]; g += swatch[i + 1]; b += swatch[i + 2]; count += 1;
+        }
+        meltDrip.color = `rgb(${Math.round(r / count)}, ${Math.round(g / count)}, ${Math.round(b / count)})`;
+        meltDrip.rgb = [Math.round(r / count), Math.round(g / count), Math.round(b / count)];
+        meltDrip.seed = Math.random() * 100;
+      }
+
+      // 加速度：按越久流越快；尖端可以流出畫作圖片外面（用整個視窗底部做上限）
+      // 流速：慢起（剛開始細流可見），按越久漸漸加快但上限壓低
+      const speed = 0.55 + Math.min(1.9, (performance.now() - meltPressStart) / 1400);
+      const bottomLimit = window.innerHeight - 4;
+      const tipY = Math.min(meltDrip.tipY + speed, bottomLimit);
+      const segmentHeight = tipY - meltDrip.tipY;
+      meltDrip.tipY = tipY;
+      meltDrip.travel += segmentHeight;
+
+      if (segmentHeight <= 0) return;
+
+      // 水流：從按壓點下方開始自然流下。邊緣用正弦波形做出有機的粗細變化，
+      // 像真實液體沿著表面流動時忽寬忽窄、局部積聚的樣子
+      const streamTop = meltDrip.y + radius * 0.4;
+      const streamHeight = meltDrip.travel;
+      const baseWidth = stripWidth * 0.36;
+      const [cr, cg, cb] = meltDrip.rgb;
+      const seed = meltDrip.seed || 0;
+
+      // 建立波形輪廓：回傳在高度 h 處的半寬
+      // 預先產生一組隨機節點，用平滑雜訊插值——每段按壓的起伏都不同，弧度隨機
+      if (!meltDrip.noise) {
+        meltDrip.noise = Array.from({ length: 64 }, () => Math.random() * 2 - 1);
+      }
+      const noiseAt = (i) => {
+        const n = meltDrip.noise;
+        const idx = Math.floor(i) % n.length;
+        const frac = i - Math.floor(i);
+        const a = n[idx];
+        const b = n[(idx + 1) % n.length];
+        // smoothstep 插值讓弧度圓滑
+        const s = frac * frac * (3 - 2 * frac);
+        return a + (b - a) * s;
+      };
+      const halfWidthAt = (h) => {
+        // 隨機雜訊（主導）+ 兩層正弦（細微紋理），每段按壓的波形都不同
+        const t = h * 0.045 + seed;
+        const noise = noiseAt(h / 46) * 0.5;
+        const w1 = Math.sin(t * 0.8) * 0.18;
+        const w2 = Math.sin(t * 2.1 + 1.7) * 0.1;
+        // 逐漸變細：起點細（0.4 倍），先漸變寬（顏料湧出積聚）到 1.35 倍，再持續收窄到 0.18 倍
+        const grow = h < radius * 3 ? 0.4 + 0.95 * (h / (radius * 3)) : Math.min(1.35, 1 + (h - radius * 3) / (radius * 2) * 0.35);
+        const taper = Math.max(0.18, 1 - h / (radius * 12));
+        return Math.max(1.2, baseWidth * taper * grow * (1 + noise + w1 + w2) / 2);
+      };
+
+      // 用波形輪廓建構封閉路徑（左邊下去、右邊上來）
+      // 頂端從寬到窄漸入（neckIn），像從按壓點「湧出」而非方形切斷
+      const neckLen = radius * 0.55;
+      const wavePath = (widthScale, alpha, blurPx) => {
+        const steps = Math.max(8, Math.round(streamHeight / 6));
+        context.globalAlpha = alpha;
+        if (blurPx > 0) context.filter = `blur(${blurPx}px)`;
+        context.beginPath();
+        // 左側：從頂端往下
+        for (let i = 0; i <= steps; i++) {
+          const h = streamHeight * i / steps;
+          let hw = halfWidthAt(h) * widthScale;
+          // 頂部漸細：前 neckLen 內從 0.25 倍寬漸入到全寬
+          if (h < neckLen) hw *= 0.25 + 0.75 * (h / neckLen);
+          const y = streamTop + h;
+          if (i === 0) context.moveTo(meltDrip.x - hw, y);
+          else context.lineTo(meltDrip.x - hw, y);
+        }
+        // 底端圓弧收尾（水滴狀圓潤底）
+        const hwEnd = halfWidthAt(streamHeight) * widthScale;
+        context.quadraticCurveTo(meltDrip.x - hwEnd, streamTop + streamHeight + hwEnd * 0.9, meltDrip.x, streamTop + streamHeight + hwEnd * 1.1);
+        context.quadraticCurveTo(meltDrip.x + hwEnd, streamTop + streamHeight + hwEnd * 0.9, meltDrip.x + hwEnd, streamTop + streamHeight);
+        // 右側：從底端往上
+        for (let i = steps; i >= 0; i--) {
+          const h = streamHeight * i / steps;
+          let hw = halfWidthAt(h) * widthScale;
+          if (h < neckLen) hw *= 0.25 + 0.75 * (h / neckLen);
+          context.lineTo(meltDrip.x + hw, streamTop + h);
+        }
+        // 頂端以圓弧閉合（窄口，不會有方形起點）
+        const hwStart = halfWidthAt(0) * widthScale * 0.25;
+        context.quadraticCurveTo(meltDrip.x + hwStart, streamTop + 2, meltDrip.x, streamTop);
+        context.quadraticCurveTo(meltDrip.x - hwStart, streamTop + 2, meltDrip.x - halfWidthAt(0) * widthScale * 0.25, streamTop);
+        context.closePath();
+        context.fillStyle = meltDrip.color;
+        context.fill();
+        context.globalAlpha = 1;
+        context.filter = "none";
+      };
+
+      context.save();
+
+      // 底層暈染：寬而模糊，像顏料浸濕紙面擴散
+      wavePath(1.5, 0.22, 7);
+      // 主體：濃稠顏料柱
+      wavePath(1.0, 0.92, 0.8);
+      // 中央加深：模擬顏料堆積的厚度
+      wavePath(0.45, 0.3, 2);
+
+      // 高光：左側細細一條亮紋，做出液體的反光與體積感
+      context.globalAlpha = 0.3;
+      context.filter = "blur(1.5px)";
+      context.fillStyle = `rgba(255, 255, 255, 0.55)`;
+      context.beginPath();
+      const hlSteps = Math.max(6, Math.round(streamHeight / 10));
+      for (let i = 0; i <= hlSteps; i++) {
+        const h = streamHeight * 0.06 + streamHeight * 0.8 * i / hlSteps;
+        const hw = halfWidthAt(h);
+        const y = streamTop + h;
+        const xOff = -hw * 0.45 + Math.sin(h * 0.02 + seed) * 1.5;
+        if (i === 0) context.moveTo(meltDrip.x + xOff, y);
+        else context.lineTo(meltDrip.x + xOff, y);
+      }
+      context.lineWidth = Math.max(1.5, baseWidth * 0.12);
+      context.strokeStyle = `rgba(255, 255, 255, 0.5)`;
+      context.stroke();
+      context.globalAlpha = 1;
+      context.filter = "none";
+
+      // 水滴頭：底部圓、頂部尖的倒泪滴（尖端接在水流末端）
+      // 大小跟隨水流末端半徑：水越細水滴越小
+      const endR = halfWidthAt(streamHeight);
+      const dropW = Math.max(endR * 2.6, 6);
+      const dropH = Math.max(endR * 3.4, 8);
+      const dropTop = streamTop + streamHeight - dropH * 0.15;
+      const [dcr, dcg, dcb] = meltDrip.rgb;
+      // 倒泪滴形：頂端尖點（接水流）、底部圓弧——用貝茲曲線畫
+      const tearPath = () => {
+        context.beginPath();
+        context.moveTo(meltDrip.x, dropTop);
+        context.bezierCurveTo(
+          meltDrip.x + dropW * 0.18, dropTop + dropH * 0.3,
+          meltDrip.x + dropW * 0.5, dropTop + dropH * 0.42,
+          meltDrip.x + dropW * 0.5, dropTop + dropH * 0.62
+        );
+        context.arc(meltDrip.x, dropTop + dropH * 0.62, dropW * 0.5, 0, Math.PI, false);
+        context.bezierCurveTo(
+          meltDrip.x - dropW * 0.5, dropTop + dropH * 0.42,
+          meltDrip.x - dropW * 0.18, dropTop + dropH * 0.3,
+          meltDrip.x, dropTop
+        );
+        context.closePath();
+      };
+      const dropY = dropTop + dropH * 0.62;
+      // 水滴本體：徑向漸層立體感（左上高光、邊緣飽和深色）
+      const dropGrad = context.createRadialGradient(
+        meltDrip.x - dropW * 0.15, dropY + dropH * 0.05, dropW * 0.08,
+        meltDrip.x, dropY + dropH * 0.05, dropW * 0.6
+      );
+      dropGrad.addColorStop(0, `rgba(${Math.min(255, dcr + 55)}, ${Math.min(255, dcg + 55)}, ${Math.min(255, dcb + 55)}, 1)`);
+      dropGrad.addColorStop(0.55, meltDrip.color);
+      dropGrad.addColorStop(1, `rgba(${Math.round(dcr * 0.5)}, ${Math.round(dcg * 0.5)}, ${Math.round(dcb * 0.5)}, 1)`);
+      context.filter = "blur(0.5px)";
+      context.fillStyle = dropGrad;
+      tearPath();
+      context.fill();
+      context.filter = "none";
+      // 水滴外圈深色描邊：顏料在滴緣堆積變深，強化大顆粒的立體感
+      context.globalAlpha = 0.55;
+      context.lineWidth = Math.max(2.5, dropW * 0.1);
+      context.strokeStyle = `rgba(${Math.round(dcr * 0.5)}, ${Math.round(dcg * 0.5)}, ${Math.round(dcb * 0.5)}, 1)`;
+      tearPath();
+      context.stroke();
+      context.globalAlpha = 1;
+      // 水滴高光小點（偏左上，圓潤感）
+      context.globalAlpha = 0.9;
+      context.fillStyle = "rgba(255,255,255,0.85)";
+      context.beginPath();
+      context.ellipse(meltDrip.x - dropW * 0.18, dropTop + dropH * 0.52, dropW * 0.13, dropH * 0.12, -0.4, 0, Math.PI * 2);
+      context.fill();
+      context.globalAlpha = 1;
+
+      // 融化暈染：沿水流輪廓放大做柔邊暈開（用波形路徑，保持有機邊緣）
+      wavePath(1.75, 0.2, 7);
+      wavePath(1.35, 0.25, 4);
+
+      // 圈內融化：把按壓圓圈內的顏料反覆柔化+向下擠，呈現「融化」的糊化感
+      // 只在按壓點在畫作內時做（圈內才有顏料可融）
+      const innerSourceY = Math.round((meltDrip.y - radius) * pixelRatio);
+      const innerH = Math.round(radius * 1.4 * pixelRatio);
+      meltCanvas.width = meltSource.width;
+      meltCanvas.height = innerH;
+      meltContext.setTransform(1, 0, 0, 1, 0, 0);
+      meltContext.clearRect(0, 0, meltSource.width, innerH);
+      meltContext.filter = "blur(2px)";
+      meltContext.drawImage(canvas, Math.round((meltDrip.x - stripWidth / 2) * pixelRatio), innerSourceY, meltSource.width, innerH, 0, 0, meltSource.width, innerH);
+      meltContext.filter = "none";
+
+      context.save();
+      context.beginPath();
+      context.arc(meltDrip.x, meltDrip.y, radius, 0, Math.PI * 2);
+      context.clip();
+      context.drawImage(meltCanvas, meltDrip.x - stripWidth / 2, meltDrip.y - radius + speed * 0.4, stripWidth, radius * 1.4);
+      context.restore();
+
+      context.restore();
+    }
+
+    function animateVortex(time) {
+      processGlitchQueue();
+      if (pointer.down && activeMode === "melt" && isInsideArtwork(pointer.x, pointer.y)) {
+        if (time - lastMeltFrame >= 40) {
+          meltPaint(pointer.x, pointer.y);
+          lastMeltFrame = time;
+
+          if (!hasInteracted) {
+            hasInteracted = true;
+            hint.classList.add("hidden");
+          }
+        }
+      }
+      if (pointer.down && pointer.longPressEligible && activeMode === "smear") {
+        const heldFor = time - pointer.pressedAt;
+        if (heldFor >= 500 && time - pointer.lastVortexFrame >= 70) {
+          swirlPaint(pointer.pressX, pointer.pressY, heldFor);
+          pointer.lastVortexFrame = time;
+
+          if (!hasInteracted) {
+            hasInteracted = true;
+            hint.classList.add("hidden");
+          }
+        }
+      }
+
+      requestAnimationFrame(animateVortex);
+    }
+
+    function movePointer(event) {
+      const currentX = event.clientX;
+      const currentY = event.clientY;
+      brushCursor.style.opacity = "1";
+      brushCursor.style.left = `${currentX}px`;
+      brushCursor.style.top = `${currentY}px`;
+
+      if (!pointer.active) {
+        pointer.previousX = currentX;
+        pointer.previousY = currentY;
+        pointer.active = true;
+      }
+
+      const deltaX = currentX - pointer.previousX;
+      const deltaY = currentY - pointer.previousY;
+      const distance = Math.hypot(deltaX, deltaY);
+
+      if (pointer.down && Math.hypot(currentX - pointer.pressX, currentY - pointer.pressY) > 14) {
+        pointer.longPressEligible = false;
+      }
+
+      if (activeMode === "glitch" || activeMode === "melt") {
+        // Glitch 只在點擊時觸發；Melt 只在長按時流動——移動都不產生塗抹
+        pointer.x = currentX;
+        pointer.y = currentY;
+        pointer.previousX = currentX;
+        pointer.previousY = currentY;
+        return;
+      }
+
+      if (distance > 0 && activeMode === "rgbsplit") {
+        // 滑鼠移動速度（px/ms）平滑後決定效果強度
+        const now = event.timeStamp || performance.now();
+        const elapsed = glitchLastMoveAt ? Math.max(1, now - glitchLastMoveAt) : 16;
+        glitchLastMoveAt = now;
+        glitchEnergy = glitchEnergy * 0.7 + (distance / elapsed) * 0.3;
+
+        const glitched = pushGlitchTrail(currentX, currentY, deltaX, deltaY);
+        if (glitched && !hasInteracted) {
+          hasInteracted = true;
+          hint.classList.add("hidden");
+        }
+
+        pointer.x = currentX;
+        pointer.y = currentY;
+        pointer.previousX = currentX;
+        pointer.previousY = currentY;
+        return;
+      }
+
+      if (distance > 0) {
+        const spacing = 10;
+        const steps = Math.min(12, Math.max(1, Math.ceil(distance / spacing)));
+        let mixedPaint = false;
+
+        for (let step = 1; step <= steps; step += 1) {
+          const progress = step / steps;
+          const x = pointer.previousX + deltaX * progress;
+          const y = pointer.previousY + deltaY * progress;
+          if (isInsideArtwork(x, y)) pointer.carryingPaint = true;
+          if (pointer.carryingPaint) {
+            mixPaint(x, y, deltaX, deltaY, distance);
+            mixedPaint = true;
+          }
+        }
+
+        if (mixedPaint && !hasInteracted) {
+          hasInteracted = true;
+          hint.classList.add("hidden");
+        }
+      }
+
+      pointer.x = currentX;
+      pointer.y = currentY;
+      pointer.previousX = currentX;
+      pointer.previousY = currentY;
+    }
+
+    canvas.addEventListener("pointermove", movePointer);
+    canvas.addEventListener("pointerleave", () => {
+      pointer.active = false;
+      pointer.carryingPaint = false;
+      pointer.down = false;
+      pointer.longPressEligible = false;
+      glitchTrail.hasPoint = false;
+      brushCursor.style.opacity = "0";
+    });
+    canvas.addEventListener("pointerdown", (event) => {
+      canvas.setPointerCapture(event.pointerId);
+      movePointer(event);
+      pointer.down = true;
+      pointer.pressX = event.clientX;
+      pointer.pressY = event.clientY;
+      pointer.pressedAt = performance.now();
+      meltPressStart = pointer.pressedAt;
+      meltDrip.active = false;
+      meltDrip.tipY = 0;
+      pointer.longPressEligible = isInsideArtwork(event.clientX, event.clientY) || pointer.carryingPaint;
+      pointer.lastVortexFrame = 0;
+      // Glitch：每次點擊在點擊處產生一次隨機數位損壞
+      if (activeMode === "glitch" && isInsideArtwork(event.clientX, event.clientY)) {
+        applyGlitchBurst(event.clientX, event.clientY);
+      }
+    });
+    canvas.addEventListener("pointerup", (event) => {
+      pointer.down = false;
+      pointer.longPressEligible = false;
+      meltDrip.active = false;
+      if (canvas.hasPointerCapture(event.pointerId)) canvas.releasePointerCapture(event.pointerId);
+    });
+    canvas.addEventListener("pointercancel", () => {
+      pointer.down = false;
+      pointer.longPressEligible = false;
+    });
+    canvas.addEventListener("contextmenu", (event) => event.preventDefault());
+    resetButton.addEventListener("click", resetArtwork);
+    window.addEventListener("resize", resizeCanvas);
+
+    let toastTimer = 0;
+
+    function showToast(message) {
+      toast.textContent = message;
+      toast.classList.add("visible");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove("visible"), 1900);
+    }
+
+    function setExportMenu(open) {
+      exportMenu.classList.toggle("open", open);
+      exportButton.setAttribute("aria-expanded", String(open));
+    }
+
+    function exportArtwork(format) {
+      setExportMenu(false);
+      canvas.toBlob((blob) => {
+        if (!blob) {
+          showToast("匯出失敗，請再試一次");
+          return;
+        }
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        const stamp = new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-");
+        link.href = url;
+        link.download = `破壞藝術-Destruction-Canva-${stamp}.${format}`;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 1500);
+        showToast(`已匯出 ${format.toUpperCase()}`);
+      }, format === "jpg" ? "image/jpeg" : "image/png", format === "jpg" ? 0.92 : undefined);
+    }
+
+    exportButton.addEventListener("click", () => {
+      setExportMenu(!exportMenu.classList.contains("open"));
+    });
+
+    exportMenu.addEventListener("click", (event) => {
+      const item = event.target.closest("button[data-format]");
+      if (item) exportArtwork(item.dataset.format);
+    });
+
+    document.addEventListener("pointerdown", (event) => {
+      if (!event.target.closest("#export, #exportMenu")) setExportMenu(false);
+    });
+
+    window.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") setExportMenu(false);
+    });
+
+    let currentObjectUrl = null;
+    let pendingObjectUrl = null;
+
+    // 估計上傳圖片的內容範圍，自動裁除四周均勻的白邊或透明邊。
+    function computeSourceRect(image) {
+      const sampleSize = 160;
+      const scale = Math.min(sampleSize / image.naturalWidth, sampleSize / image.naturalHeight, 1);
+      const width = Math.max(1, Math.round(image.naturalWidth * scale));
+      const height = Math.max(1, Math.round(image.naturalHeight * scale));
+      trimCanvas.width = width;
+      trimCanvas.height = height;
+      trimContext.clearRect(0, 0, width, height);
+      trimContext.drawImage(image, 0, 0, width, height);
+
+      let data;
+      try {
+        data = trimContext.getImageData(0, 0, width, height).data;
+      } catch {
+        return { x: 0, y: 0, width: image.naturalWidth, height: image.naturalHeight };
+      }
+
+      const threshold = 244;
+      let left = width;
+      let top = height;
+      let right = -1;
+      let bottom = -1;
+
+      for (let y = 0; y < height; y += 1) {
+        for (let x = 0; x < width; x += 1) {
+          const index = (y * width + x) * 4;
+          const isContent = data[index + 3] > 16
+            && Math.min(data[index], data[index + 1], data[index + 2]) < threshold;
+          if (isContent) {
+            if (x < left) left = x;
+            if (x > right) right = x;
+            if (y < top) top = y;
+            if (y > bottom) bottom = y;
+          }
+        }
+      }
+
+      if (right - left < 1 || bottom - top < 1) {
+        return { x: 0, y: 0, width: image.naturalWidth, height: image.naturalHeight };
+      }
+
+      const padX = (right - left + 1) * 0.012;
+      const padY = (bottom - top + 1) * 0.012;
+      const startX = Math.max(0, (left - padX) / scale);
+      const startY = Math.max(0, (top - padY) / scale);
+      const endX = Math.min(image.naturalWidth, (right + 1 + padX) / scale);
+      const endY = Math.min(image.naturalHeight, (bottom + 1 + padY) / scale);
+
+      return {
+        x: Math.round(startX),
+        y: Math.round(startY),
+        width: Math.max(1, Math.round(endX - startX)),
+        height: Math.max(1, Math.round(endY - startY))
+      };
+    }
+
+    function handleSourceLoad() {
+      if (pendingObjectUrl) {
+        if (currentObjectUrl) URL.revokeObjectURL(currentObjectUrl);
+        currentObjectUrl = pendingObjectUrl;
+        pendingObjectUrl = null;
+        sourceRect = computeSourceRect(sourceImage);
+        showToast("已載入圖片");
+      }
+      resizeCanvas();
+    }
+
+    function handleSourceError() {
+      if (pendingObjectUrl) {
+        URL.revokeObjectURL(pendingObjectUrl);
+        pendingObjectUrl = null;
+        showToast("圖片載入失敗，請換一張試試");
+      } else {
+        hint.textContent = "畫作載入失敗";
+      }
+    }
+
+    function loadUserImage(file) {
+      if (!file) return;
+      if (!file.type.startsWith("image/")) {
+        showToast("請選擇圖片檔案");
+        return;
+      }
+      pendingObjectUrl = URL.createObjectURL(file);
+      sourceImage.src = pendingObjectUrl;
+    }
+
+    uploadButton.addEventListener("click", () => uploadInput.click());
+
+    uploadInput.addEventListener("change", () => {
+      loadUserImage(uploadInput.files && uploadInput.files[0]);
+      uploadInput.value = "";
+    });
+
+    let dragDepth = 0;
+
+    window.addEventListener("dragenter", (event) => {
+      event.preventDefault();
+      dragDepth += 1;
+      dropOverlay.classList.add("visible");
+    });
+
+    window.addEventListener("dragover", (event) => event.preventDefault());
+
+    window.addEventListener("dragleave", (event) => {
+      event.preventDefault();
+      dragDepth = Math.max(0, dragDepth - 1);
+      if (dragDepth === 0) dropOverlay.classList.remove("visible");
+    });
+
+    window.addEventListener("drop", (event) => {
+      event.preventDefault();
+      dragDepth = 0;
+      dropOverlay.classList.remove("visible");
+      loadUserImage(event.dataTransfer && event.dataTransfer.files[0]);
+    });
+
+    window.addEventListener("paste", (event) => {
+      const items = event.clipboardData && event.clipboardData.items;
+      const item = items && Array.from(items).find((entry) => entry.type.startsWith("image/"));
+      if (item) loadUserImage(item.getAsFile());
+    });
+
+    // ---- RGB Split 與 Glitch（數位破壞）手法實作 ----
+    // RGB Split：沿掃動路徑排入取樣點，速度決定強度，
+    //   彩色 RGB displacement / Scanline / Pixel displacement / Datamosh
+    // Glitch：每次點擊在點擊處產生一次隨機數位損壞（切片錯位、拉伸、
+    //   複製拖影、水平垂直位移），保留原圖色彩，效果固定累積。
+
+    // Glitch 點擊爆發：來源與輸出畫布（切片從乾淨來源讀取，避免互相覆蓋）
+    const glitchBurstSource = document.createElement("canvas");
+    const glitchBurstSourceContext = glitchBurstSource.getContext("2d", { willReadFrequently: true });
+    const glitchBurstOut = document.createElement("canvas");
+    const glitchBurstOutContext = glitchBurstOut.getContext("2d");
+
+    function applyGlitchBurst(x, y) {
+      if (!originalCanvas.width) return;
+      // 每次點擊隨機強度：有時輕微、有時強烈
+      const intensity = 0.3 + Math.random() * 0.7;
+      const art = artworkRect;
+      // 受損區域固定扁長形：寬度明顯大於高度，且整體範圍壓小
+      const bandW = art.width * (0.24 + Math.random() * 0.28);
+      const bandH = Math.max(14, art.height * (0.035 + Math.random() * 0.075));
+      // 區域中心：點擊處加隨機偏移，可超出圖片邊緣（只夾限在視窗畫布內），
+      // 讓切片錯位、碎片與噪點能蔓延到畫作框外
+      const cx = Math.min(window.innerWidth - bandW / 2, Math.max(bandW / 2, x + (Math.random() - 0.5) * bandW * 0.5));
+      const cy = Math.min(window.innerHeight - bandH / 2, Math.max(bandH / 2, y + (Math.random() - 0.5) * bandH * 0.5));
+
+      const bw = Math.round(bandW * pixelRatio);
+      const bh = Math.round(bandH * pixelRatio);
+      if (bw < 10 || bh < 10) return;
+      const bx = Math.round((cx - bandW / 2) * pixelRatio);
+      const by = Math.round((cy - bandH / 2) * pixelRatio);
+
+      // 擷取目前區域作為乾淨來源
+      glitchBurstSource.width = bw;
+      glitchBurstSource.height = bh;
+      glitchBurstSourceContext.drawImage(canvas, bx, by, bw, bh, 0, 0, bw, bh);
+      glitchBurstOut.width = bw;
+      glitchBurstOut.height = bh;
+      glitchBurstOutContext.clearRect(0, 0, bw, bh);
+      glitchBurstOutContext.drawImage(glitchBurstSource, 0, 0);
+      const g = glitchBurstOutContext;
+      const s = glitchBurstSource;
+
+      // 水平切片：錯位＋拉伸＋局部垂直位移＋拖影
+      const sliceCount = 3 + Math.floor(Math.random() * 10 * intensity);
+      const maxShift = bw * (0.03 + 0.16 * intensity);
+      let sy = 0;
+      while (sy < bh - 2) {
+        const sliceH = Math.max(2, Math.round((bh / sliceCount) * (0.35 + Math.random() * 1.3)));
+        const h = Math.min(sliceH, bh - sy);
+        const dx = Math.round((Math.random() - 0.5) * 2 * maxShift);
+        const stretch = 1 + (Math.random() - 0.35) * 0.55 * intensity;
+        const dy = Math.random() < 0.25 ? Math.round((Math.random() - 0.5) * 2 * maxShift * 0.4) : 0;
+        // 拖影：半透明複製一份再疊正式切片
+        if (Math.random() < 0.35) {
+          g.globalAlpha = 0.2 + Math.random() * 0.35;
+          g.drawImage(s, 0, sy, bw, h, dx * 0.5 + (Math.random() - 0.5) * 10, sy + dy * 0.5, bw * stretch, h);
+          g.globalAlpha = 1;
+        }
+        g.drawImage(s, 0, sy, bw, h, dx, sy + dy, bw * stretch, h);
+        sy += h;
+      }
+
+      // 垂直切片：上下錯位（隨機出現）
+      if (Math.random() < 0.5) {
+        let sx = 0;
+        const vMax = bh * (0.03 + 0.1 * intensity);
+        while (sx < bw - 2) {
+          const sliceW = Math.max(2, Math.round((bw / (sliceCount + 4)) * (0.4 + Math.random() * 1.4)));
+          const w2 = Math.min(sliceW, bw - sx);
+          const dy = Math.round((Math.random() - 0.5) * 2 * vMax);
+          g.drawImage(s, sx, 0, w2, bh, sx, dy, w2, bh);
+          sx += w2;
+        }
+      }
+
+      // 強烈時：一條細長碎片大幅位移（細長影像碎片）
+      if (intensity > 0.55 && Math.random() < 0.7) {
+        const fy = Math.round(Math.random() * bh);
+        const fh = Math.max(2, Math.round(bh * (0.02 + Math.random() * 0.06)));
+        g.drawImage(
+          s,
+          0, fy, bw, fh,
+          (Math.random() - 0.5) * bw * 0.5 * intensity,
+          fy + (Math.random() - 0.5) * bh * 0.3,
+          bw * (0.7 + Math.random() * 0.9),
+          fh
+        );
+      }
+
+      // 彩色噪點：在受損區域撒上細小的彩色雜訊
+      // 密度隨強度並且每次隨機，上限壓低——只是點綴，不會蓋過畫作
+      const noiseColor = () => {
+        const pick = Math.random();
+        if (pick < 0.18) return `rgb(255, ${Math.round(70 + Math.random() * 90)}, 70)`;
+        if (pick < 0.36) return `rgb(70, 235, ${Math.round(110 + Math.random() * 60)})`;
+        if (pick < 0.54) return `rgb(70, 140, 255)`;
+        if (pick < 0.7) return `rgb(255, 225, 70)`;
+        if (pick < 0.85) return `rgb(240, 70, 230)`;
+        if (pick < 0.94) return `rgb(35, 38, 48)`;
+        return `rgb(252, 252, 252)`;
+      };
+      const noiseDensity = (0.002 + 0.009 * intensity) * (0.5 + Math.random() * 0.9);
+      const dotCount = Math.round((bw / pixelRatio) * (bh / pixelRatio) * noiseDensity);
+      for (let n = 0; n < dotCount; n += 1) {
+        const dotSize = (0.8 + Math.random() * 1.7) * pixelRatio;
+        g.globalAlpha = 0.4 + Math.random() * 0.45;
+        g.fillStyle = noiseColor();
+        g.fillRect(Math.random() * bw, Math.random() * bh, dotSize, dotSize);
+      }
+      g.globalAlpha = 1;
+      // 少量彩色橫向雜訊條（數量隨機，最多 3 條）
+      const streaks = Math.round(Math.random() * 1.4 + intensity * 1.6);
+      for (let st = 0; st < streaks; st += 1) {
+        g.globalAlpha = 0.18 + Math.random() * 0.26;
+        g.fillStyle = `hsl(${Math.floor(Math.random() * 360)}, 92%, 62%)`;
+        g.fillRect(
+          Math.random() * bw,
+          Math.random() * bh,
+          5 + Math.random() * 36 * intensity,
+          1 + Math.random() * 2
+        );
+      }
+      g.globalAlpha = 1;
+
+      // 烘焙回主畫布（固定累積，下次點擊在此基礎上繼續破壞）
+      context.drawImage(
+        glitchBurstOut,
+        bx / pixelRatio, by / pixelRatio, bw / pixelRatio, bh / pixelRatio
+      );
+
+      if (!hasInteracted) {
+        hasInteracted = true;
+        hint.classList.add("hidden");
+      }
+    }
+
+    function pushGlitchTrail(x, y, deltaX, deltaY) {
+      const spacing = Math.max(12, Math.min(26, artworkRect.width * 0.035));
+      let queued = false;
+
+      if (!glitchTrail.hasPoint) {
+        glitchTrail.lastX = x;
+        glitchTrail.lastY = y;
+        glitchTrail.hasPoint = true;
+        if (isInsideArtwork(x, y)) {
+          glitchQueue.push({ x, y, dx: deltaX, dy: deltaY, energy: glitchEnergy });
+          queued = true;
+        }
+      } else {
+        let lastX = glitchTrail.lastX;
+        let lastY = glitchTrail.lastY;
+        let remaining = Math.hypot(x - lastX, y - lastY);
+
+        while (remaining >= spacing) {
+          const progress = spacing / remaining;
+          lastX += (x - lastX) * progress;
+          lastY += (y - lastY) * progress;
+          remaining -= spacing;
+          if (isInsideArtwork(lastX, lastY)) {
+            glitchQueue.push({ x: lastX, y: lastY, dx: deltaX, dy: deltaY, energy: glitchEnergy });
+            queued = true;
+          }
+        }
+
+        glitchTrail.lastX = lastX;
+        glitchTrail.lastY = lastY;
+      }
+
+      if (glitchQueue.length > 80) glitchQueue.splice(0, glitchQueue.length - 80);
+      return queued;
+    }
+
+    function processGlitchQueue() {
+      let budget = 4;
+      while (budget > 0 && glitchQueue.length > 0) {
+        const point = glitchQueue.shift();
+        applyGlitchRegion(point.x, point.y, point.dx, point.dy, point.energy, "rgbsplit");
+        budget -= 1;
+      }
+    }
+
+    function applyGlitchRegion(x, y, deltaX, deltaY, energy, mode) {
+      const isMono = mode === "glitch";
+      const intensity = Math.min(1, 0.2 + energy * 0.3);
+      const radius = Math.max(30, Math.min(58, artworkRect.width * 0.07)) * (0.9 + intensity * 0.3);
+      const baseSpan = Math.round(radius * 2 * pixelRatio);
+      if (baseSpan < 12) return;
+
+      // Glitch：扁長區域——沿掃動方向拉長、垂直壓扁，比例隨機
+      const stretch = 1.6 + Math.random() * 1.4;
+      const squash = 0.35 + Math.random() * 0.35;
+      const span = isMono ? Math.round(baseSpan * stretch) : baseSpan;
+      const spanH = isMono ? Math.max(8, Math.round(baseSpan * squash)) : baseSpan;
+
+      let x0 = Math.round(x * pixelRatio) - (span >> 1);
+      let y0 = Math.round(y * pixelRatio) - (spanH >> 1);
+      if (x0 < 0) x0 = 0;
+      if (y0 < 0) y0 = 0;
+      if (x0 + span > canvas.width) x0 = canvas.width - span;
+      if (y0 + spanH > canvas.height) y0 = canvas.height - spanH;
+      if (x0 < 0 || y0 < 0) return;
+
+      glitchCanvas.width = span;
+      glitchCanvas.height = spanH;
+      glitchContext.drawImage(canvas, x0, y0, span, spanH, 0, 0, span, spanH);
+
+      const frame = glitchContext.getImageData(0, 0, span, spanH);
+      const pixels = frame.data;
+      if (!glitchSource || glitchSource.length !== pixels.length) {
+        glitchSource = new Uint8ClampedArray(pixels.length);
+      }
+      glitchSource.set(pixels);
+      const source = glitchSource;
+
+      const length = Math.hypot(deltaX, deltaY) || 1;
+      const dirX = deltaX / length;
+      const dirY = deltaY / length;
+
+      // 黑白 Glitch：先轉灰階，再以 Scanline + Pixel displacement 呈現
+      if (isMono) {
+        for (let i = 0; i < pixels.length; i += 4) {
+          const gray = pixels[i] * 0.299 + pixels[i + 1] * 0.587 + pixels[i + 2] * 0.114;
+          pixels[i] = gray;
+          pixels[i + 1] = gray;
+          pixels[i + 2] = gray;
+        }
+      }
+
+      // RGB displacement：紅藍通道沿掃動方向前後錯位（僅彩色模式）
+      const magnitude = span * (0.02 + 0.075 * intensity);
+      const redOffsetX = isMono ? 0 : dirX * magnitude;
+      const redOffsetY = isMono ? 0 : dirY * magnitude;
+      const blueOffsetX = isMono ? 0 : -dirX * magnitude;
+      const blueOffsetY = isMono ? 0 : -dirY * magnitude;
+      const greenOffsetX = isMono ? 0 : (Math.random() - 0.5) * magnitude * 0.5;
+      const greenOffsetY = isMono ? 0 : (Math.random() - 0.5) * magnitude * 0.2;
+
+      // Scanline：掃描線變暗，部分整列水平錯位
+      // Glitch：每條掃描線的間距與粗細與粗細隨機，錯位帶高度也隨機
+      const rowDark = new Uint8Array(spanH);
+      const rowShift = new Float32Array(spanH);
+      const scanDarken = isMono ? 1 - 0.62 * intensity : 1 - 0.42 * intensity;
+      if (isMono) {
+        let row = 0;
+        while (row < spanH) {
+          const gap = 2 + ((Math.random() * Math.max(2, spanH * 0.07)) | 0);
+          const width = 1 + ((Math.random() * Math.max(1, gap * 0.7)) | 0);
+          row += gap;
+          for (let k = 0; k < width && row < spanH; k += 1, row += 1) rowDark[row] = 1;
+        }
+        let band = 0;
+        while (band < spanH) {
+          const bandHeight = 2 + ((Math.random() * Math.max(2, spanH * 0.1)) | 0);
+          const shift = Math.random() < 0.4 + intensity * 0.4
+            ? (Math.random() - 0.5) * 2 * span * 0.09 * intensity
+            : 0;
+          for (let k = 0; k < bandHeight && band < spanH; k += 1, band += 1) rowShift[band] = shift;
+        }
+        for (let row2 = 1; row2 < spanH - 1; row2 += 1) {
+          rowShift[row2] = (rowShift[row2 - 1] + rowShift[row2] * 2 + rowShift[row2 + 1]) / 4;
+        }
+      } else {
+        const scanGap = Math.max(3, Math.round(span / 26));
+        const scanWidth = Math.max(1, Math.round(scanGap * 0.45));
+        for (let row = 0; row < spanH; row += 1) {
+          rowDark[row] = (row % scanGap) < scanWidth ? 1 : 0;
+        }
+        const bandHeight = scanGap * 2;
+        const bandCount = Math.ceil(spanH / bandHeight) + 1;
+        const bandShifts = new Float32Array(bandCount);
+        for (let band = 0; band < bandCount; band += 1) {
+          bandShifts[band] = Math.random() < 0.32 + intensity * 0.45
+            ? (Math.random() - 0.5) * 2 * span * 0.055 * intensity
+            : 0;
+        }
+        for (let band = 1; band < bandCount - 1; band += 1) {
+          bandShifts[band] = (bandShifts[band - 1] + bandShifts[band] * 2 + bandShifts[band + 1]) / 4;
+        }
+        for (let row = 0; row < spanH; row += 1) rowShift[row] = bandShifts[(row / bandHeight) | 0];
+      }
+
+      // Pixel displacement：方塊位移場——Glitch 的方塊大小隨機不統一
+      const blockSize = Math.max(4, Math.round(span / 14));
+      const buildEdges = (total, randomize) => {
+        const edges = [0];
+        while (edges[edges.length - 1] < total) {
+          const step = randomize
+            ? Math.max(3, Math.round(total / 16 + Math.random() * (total / 9)))
+            : blockSize;
+          edges.push(Math.min(total, edges[edges.length - 1] + step));
+        }
+        return edges;
+      };
+      const colEdges = buildEdges(span, isMono);
+      const rowEdges = buildEdges(spanH, isMono);
+      const colCount = colEdges.length - 1;
+      const rowCount = rowEdges.length - 1;
+      const colOf = new Uint16Array(span);
+      const rowOf = new Uint16Array(spanH);
+      for (let c = 0; c < colCount; c += 1) {
+        for (let px = colEdges[c]; px < colEdges[c + 1]; px += 1) colOf[px] = c;
+      }
+      for (let r = 0; r < rowCount; r += 1) {
+        for (let py = rowEdges[r]; py < rowEdges[r + 1]; py += 1) rowOf[py] = r;
+      }
+      const blockShiftX = new Float32Array(colCount * rowCount);
+      const blockShiftY = new Float32Array(colCount * rowCount);
+      const blockMosh = new Uint8Array(colCount * rowCount);
+      for (let block = 0; block < blockMosh.length; block += 1) {
+        if (Math.random() < 0.1 + intensity * 0.3) {
+          blockShiftX[block] = (Math.random() - 0.5) * 2 * span * (isMono ? 0.1 : 0.07) * intensity;
+          blockShiftY[block] = (Math.random() - 0.5) * 2 * spanH * (isMono ? 0.05 : 0.035) * intensity;
+        }
+        if (!isMono && Math.random() < 0.06 + intensity * 0.2) blockMosh[block] = 1;
+      }
+      const quantizeStep = Math.max(14, Math.round(38 - intensity * 16));
+      // 黑白模式：Bayer 4x4 有序抖動，讓灰階變成純黑白點陣
+      const bayer = [
+        [0, 8, 2, 10],
+        [12, 4, 14, 6],
+        [3, 11, 1, 9],
+        [15, 7, 13, 5]
+      ];
+      const ditherStrength = isMono ? 0.55 + intensity * 0.45 : 0;
+
+      for (let py = 0; py < spanH; py += 1) {
+        const scanLine = rowDark[py] === 1;
+        const bandShift = rowShift[py];
+        const blockRow = rowOf[py] * colCount;
+        const rowBase = py * span * 4;
+
+        for (let px = 0; px < span; px += 1) {
+          const block = blockRow + colOf[px];
+          const baseX = px + bandShift + blockShiftX[block];
+          const baseY = py + blockShiftY[block];
+
+          let sampleX = Math.round(baseX + redOffsetX);
+          let sampleY = Math.round(baseY + redOffsetY);
+          if (sampleX < 0) sampleX = 0; else if (sampleX >= span) sampleX = span - 1;
+          if (sampleY < 0) sampleY = 0; else if (sampleY >= spanH) sampleY = spanH - 1;
+          let index = (sampleY * span + sampleX) * 4;
+          let red = source[index];
+
+          sampleX = Math.round(baseX + greenOffsetX);
+          sampleY = Math.round(baseY + greenOffsetY);
+          if (sampleX < 0) sampleX = 0; else if (sampleX >= span) sampleX = span - 1;
+          if (sampleY < 0) sampleY = 0; else if (sampleY >= spanH) sampleY = spanH - 1;
+          index = (sampleY * span + sampleX) * 4;
+          let green = source[index + 1];
+
+          sampleX = Math.round(baseX + blueOffsetX);
+          sampleY = Math.round(baseY + blueOffsetY);
+          if (sampleX < 0) sampleX = 0; else if (sampleX >= span) sampleX = span - 1;
+          if (sampleY < 0) sampleY = 0; else if (sampleY >= spanH) sampleY = spanH - 1;
+          index = (sampleY * span + sampleX) * 4;
+          let blue = source[index + 2];
+
+          if (scanLine) {
+            red *= scanDarken;
+            green *= scanDarken;
+            blue *= scanDarken;
+          }
+
+          if (blockMosh[block]) {
+            red = Math.round(red / quantizeStep) * quantizeStep + 6;
+            green = Math.round(green / quantizeStep) * quantizeStep + 6;
+            blue = Math.round(blue / quantizeStep) * quantizeStep + 6;
+          }
+
+          if (isMono) {
+            // Bayer 抖動：灰階 → 純黑白點陣
+            const threshold = (bayer[py & 3][px & 3] + 0.5) / 16 - 0.5;
+            const dithered = red + threshold * 255 * ditherStrength;
+            const bit = dithered > 127 ? 255 : 0;
+            red = bit;
+            green = bit;
+            blue = bit;
+          }
+
+          const outIndex = rowBase + px * 4;
+          pixels[outIndex] = red;
+          pixels[outIndex + 1] = green;
+          pixels[outIndex + 2] = blue;
+        }
+      }
+
+      glitchContext.putImageData(frame, 0, 0);
+
+      if (!isMono) {
+        // Datamosh：殘影拖尾（沿掃動方向疊加位移）——僅彩色模式
+        // 泛白修正：拖尾改用半透明疊加（不加光），僅保留微量加法光暈，
+        // 高速時不再把亮部推向純白（原本 lighter 疊加最多 +0.56 白光）
+        glitchContext.globalCompositeOperation = "source-over";
+        glitchContext.globalAlpha = 0.14 + 0.12 * intensity;
+        glitchContext.drawImage(glitchCanvas, dirX * magnitude * 0.9, dirY * magnitude * 0.9);
+        glitchContext.globalAlpha = 0.08 + 0.08 * intensity;
+        glitchContext.drawImage(glitchCanvas, dirX * magnitude * 1.8, dirY * magnitude * 1.8);
+        glitchContext.globalCompositeOperation = "lighter";
+        glitchContext.globalAlpha = 0.12 + 0.16 * intensity;
+        glitchContext.drawImage(glitchCanvas, dirX * magnitude * 0.9, dirY * magnitude * 0.9);
+        glitchContext.globalAlpha = 1;
+        glitchContext.globalCompositeOperation = "source-over";
+
+        // Datamosh：隨機區塊重複貼上，模擬 macroblock 錯置
+        const echoes = 1 + Math.round(intensity * 3);
+        for (let echo = 0; echo < echoes; echo += 1) {
+          const echoWidth = blockSize * (1 + ((Math.random() * 2.5) | 0));
+          const echoHeight = blockSize * (1 + ((Math.random() * 2.5) | 0));
+          const echoX = Math.random() * Math.max(1, span - echoWidth);
+          const echoY = Math.random() * Math.max(1, spanH - echoHeight);
+          glitchContext.drawImage(
+            glitchCanvas,
+            echoX,
+            echoY,
+            echoWidth,
+            echoHeight,
+            echoX + (Math.random() - 0.5) * span * 0.18 * intensity,
+            echoY + (Math.random() - 0.5) * span * 0.09 * intensity,
+            echoWidth,
+            echoHeight
+          );
+        }
+      }
+
+      // 以柔邊範圍烘焙回畫布，效果固定累積
+      // 黑白模式用扁長橢圓遮罩，彩色模式用圓形柔邊
+      const half = span / 2;
+      glitchContext.globalCompositeOperation = "destination-in";
+      if (isMono) {
+        // 扁長橢圓遮罩：中央實心、邊緣柔化
+        glitchContext.save();
+        glitchContext.translate(half, spanH / 2);
+        glitchContext.scale(1, spanH / span);
+        const mask = glitchContext.createRadialGradient(0, 0, span * 0.26, 0, 0, span * 0.5);
+        mask.addColorStop(0, "rgba(0, 0, 0, 1)");
+        mask.addColorStop(0.72, "rgba(0, 0, 0, 1)");
+        mask.addColorStop(1, "rgba(0, 0, 0, 0)");
+        glitchContext.fillStyle = mask;
+        glitchContext.fillRect(-half, -span / 2, span, span);
+        glitchContext.restore();
+      } else {
+        const mask = glitchContext.createRadialGradient(half, half, half * 0.5, half, half, half);
+        mask.addColorStop(0, "rgba(0, 0, 0, 1)");
+        mask.addColorStop(1, "rgba(0, 0, 0, 0)");
+        glitchContext.fillStyle = mask;
+        glitchContext.fillRect(0, 0, span, span);
+      }
+      glitchContext.globalCompositeOperation = "source-over";
+
+      context.drawImage(
+        glitchCanvas,
+        x0 / pixelRatio,
+        y0 / pixelRatio,
+        span / pixelRatio,
+        spanH / pixelRatio
+      );
+    }
+
+    // ---- 手法切換 ----
+    function setMode(mode) {
+      if (activeMode === mode) return;
+      activeMode = mode;
+      pointer.longPressEligible = false;
+      modeSmearButton.classList.toggle("active", mode === "smear");
+      modeGlitchButton.classList.toggle("active", mode === "glitch");
+      modeRGBSplitButton.classList.toggle("active", mode === "rgbsplit");
+      modeMeltButton.classList.toggle("active", mode === "melt");
+      modeSmearButton.setAttribute("aria-pressed", String(mode === "smear"));
+      modeGlitchButton.setAttribute("aria-pressed", String(mode === "glitch"));
+      modeRGBSplitButton.setAttribute("aria-pressed", String(mode === "rgbsplit"));
+      modeMeltButton.setAttribute("aria-pressed", String(mode === "melt"));
+      brushCursor.classList.toggle("glitch", mode === "glitch" || mode === "rgbsplit");
+      glitchTrail.hasPoint = false;
+
+      // 引導文字：每次切換手法都重新顯示，先淡出 → 換文字 → 再淡入
+      const showModeHint = () => {
+        hint.textContent = MODE_HINTS[mode];
+        hint.classList.remove("hidden");
+      };
+      if (hint.classList.contains("hidden")) {
+        showModeHint();
+      } else {
+        hint.classList.add("hidden");
+        if (hintFadeTimer) clearTimeout(hintFadeTimer);
+        hintFadeTimer = setTimeout(showModeHint, 700);
+      }
+    }
+
+    modeSmearButton.addEventListener("click", () => setMode("smear"));
+    modeGlitchButton.addEventListener("click", () => setMode("glitch"));
+    modeRGBSplitButton.addEventListener("click", () => setMode("rgbsplit"));
+    modeMeltButton.addEventListener("click", () => setMode("melt"));
+
+    sourceImage.addEventListener("load", handleSourceLoad);
+    sourceImage.addEventListener("error", handleSourceError);
+    sourceImage.src = "克羅姆-吻.jpg";
+    requestAnimationFrame(animateVortex);
+  </script>
+</body>
+</html>
