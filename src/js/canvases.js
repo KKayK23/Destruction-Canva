@@ -14,7 +14,8 @@ export const modeButtons = {
   smear: document.querySelector("#modeSmear"),
   glitch: document.querySelector("#modeGlitch"),
   rgbsplit: document.querySelector("#modeRGBSplit"),
-  melt: document.querySelector("#modeMelt")
+  melt: document.querySelector("#modeMelt"),
+  sticker: document.querySelector("#modeSticker")
 };
 
 export const sourceImage = new Image();

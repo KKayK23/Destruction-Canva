@@ -15,6 +15,7 @@ export const session = {
   hasInteracted: false,
   activeMode: "smear",
   hintFadeTimer: null,
+  hintAutoFadeTimer: null,
   toastTimer: 0
 };
 // Glitch 手法：掃動佇列與速度能量
@@ -29,7 +30,8 @@ export const MODE_HINTS = {
   smear: "移動滑鼠，攪動畫面",
   rgbsplit: "掃過畫面，拉出色差",
   glitch: "點擊畫面，隨機數位損壞",
-  melt: "按住滑動，顏料融化滴落"
+  melt: "按住滑動，顏料融化滴落",
+  sticker: "點擊畫面，貼上笑臉貼紙"
 };
 // Melt 手法：滑動水流狀態
 export const meltState = {

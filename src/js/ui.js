@@ -18,12 +18,15 @@ export function setMode(mode) {
     button.setAttribute("aria-pressed", String(mode === name));
   });
   brushCursor.classList.toggle("glitch", mode === "glitch" || mode === "rgbsplit");
+  brushCursor.classList.toggle("drip", mode === "melt");
   glitchState.trail.hasPoint = false;
 
-  // 引導文字：每次切換手法都重新顯示，先淡出 → 換文字 → 再淡入
+  // 引導文字：每次切換手法都重新顯示，先淡出 → 換文字 → 再淡入，停留後自動淡出
   const showModeHint = () => {
     hint.textContent = MODE_HINTS[mode];
     hint.classList.remove("hidden");
+    if (session.hintAutoFadeTimer) clearTimeout(session.hintAutoFadeTimer);
+    session.hintAutoFadeTimer = setTimeout(() => hint.classList.add("hidden"), 2600);
   };
   if (hint.classList.contains("hidden")) {
     showModeHint();
@@ -149,3 +152,4 @@ modeButtons.smear.addEventListener("click", () => setMode("smear"));
 modeButtons.glitch.addEventListener("click", () => setMode("glitch"));
 modeButtons.rgbsplit.addEventListener("click", () => setMode("rgbsplit"));
 modeButtons.melt.addEventListener("click", () => setMode("melt"));
+modeButtons.sticker.addEventListener("click", () => setMode("sticker"));

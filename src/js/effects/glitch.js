@@ -129,11 +129,6 @@ export function applyGlitchBurst(x, y) {
     glitchBurstOut,
     bx / view.pixelRatio, by / view.pixelRatio, bw / view.pixelRatio, bh / view.pixelRatio
   );
-
-  if (!session.hasInteracted) {
-    session.hasInteracted = true;
-    hint.classList.add("hidden");
-  }
 }
 
 export function pushGlitchTrail(x, y, deltaX, deltaY) {

@@ -5,25 +5,17 @@ import { resizeCanvas, isInsideArtwork, resetArtwork } from "./display.js"
 import { mixPaint, swirlPaint } from "./effects/smear.js";
 import { applyGlitchBurst, processGlitchQueue, pushGlitchTrail } from "./effects/glitch.js";
 import { spawnTrailDrip, updateTrailDrips } from "./effects/melt.js";
+import { placeSticker } from "./effects/sticker.js";
 import { setMode, handleSourceLoad, handleSourceError } from "./ui.js";
 export function animateVortex(time) {
   processGlitchQueue();
   // 滑動水流：每幀推進（放開後也繼續流到各自的隨機長度為止）
   updateTrailDrips();
-  if (pointer.down && session.activeMode === "melt" && !session.hasInteracted) {
-    session.hasInteracted = true;
-    hint.classList.add("hidden");
-  }
   if (pointer.down && pointer.longPressEligible && session.activeMode === "smear") {
     const heldFor = time - pointer.pressedAt;
     if (heldFor >= 500 && time - pointer.lastVortexFrame >= 70) {
       swirlPaint(pointer.pressX, pointer.pressY, heldFor);
       pointer.lastVortexFrame = time;
-
-      if (!session.hasInteracted) {
-        session.hasInteracted = true;
-        hint.classList.add("hidden");
-      }
     }
   }
 
@@ -51,7 +43,7 @@ function movePointer(event) {
     pointer.longPressEligible = false;
   }
 
-  if (session.activeMode === "glitch" || session.activeMode === "melt") {
+  if (session.activeMode === "glitch" || session.activeMode === "melt" || session.activeMode === "sticker") {
     // Glitch 只在點擊時觸發；Melt 長按流動——移動時沿路徑隨機留下小水流
     if (session.activeMode === "melt" && pointer.down && distance > 0) {
       // 沿移動路徑撒水流：純機率隨機生成，但加上「最長空窗」保底——
@@ -83,11 +75,6 @@ function movePointer(event) {
     glitchState.energy = glitchState.energy * 0.7 + (distance / elapsed) * 0.3;
 
     const glitched = pushGlitchTrail(currentX, currentY, deltaX, deltaY);
-    if (glitched && !session.hasInteracted) {
-      session.hasInteracted = true;
-      hint.classList.add("hidden");
-    }
-
     pointer.x = currentX;
     pointer.y = currentY;
     pointer.previousX = currentX;
@@ -109,11 +96,6 @@ function movePointer(event) {
         mixPaint(x, y, deltaX, deltaY, distance);
         mixedPaint = true;
       }
-    }
-
-    if (mixedPaint && !session.hasInteracted) {
-      session.hasInteracted = true;
-      hint.classList.add("hidden");
     }
   }
 
@@ -152,6 +134,10 @@ canvas.addEventListener("pointerdown", (event) => {
   if (session.activeMode === "glitch" && isInsideArtwork(event.clientX, event.clientY)) {
     applyGlitchBurst(event.clientX, event.clientY);
   }
+  // Smiley Face：點擊處貼上一張隨機笑臉貼紙（白邊 + 底部陰影）
+  if (session.activeMode === "sticker" && isInsideArtwork(event.clientX, event.clientY)) {
+    placeSticker(event.clientX, event.clientY);
+  }
 });
 canvas.addEventListener("pointerup", (event) => {
   pointer.down = false;
@@ -168,4 +154,6 @@ window.addEventListener("resize", resizeCanvas);
 sourceImage.addEventListener("load", handleSourceLoad);
 sourceImage.addEventListener("error", handleSourceError);
 sourceImage.src = "克羅姆-吻.jpg";
+// 初始提示文字：停留後自動淡出（與切換手法的提示行為一致）
+session.hintAutoFadeTimer = setTimeout(() => hint.classList.add("hidden"), 2600);
 requestAnimationFrame(animateVortex);

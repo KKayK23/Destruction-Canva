@@ -33,7 +33,7 @@
     .hint {
       position: fixed;
       left: 50%;
-      bottom: max(30px, env(safe-area-inset-bottom));
+      bottom: max(18px, env(safe-area-inset-bottom));
       z-index: 2;
       margin: 0;
       transform: translateX(-50%);
@@ -93,7 +93,7 @@
       }
 
       .hint {
-        bottom: calc(max(20px, env(safe-area-inset-bottom)) + 56px);
+        bottom: calc(max(20px, env(safe-area-inset-bottom)) + 44px);
       }
 
       .credit {
@@ -104,7 +104,7 @@
 
     @media (min-width: 620px) {
       .hint {
-        bottom: calc(max(20px, env(safe-area-inset-bottom)) + 34px);
+        bottom: calc(max(20px, env(safe-area-inset-bottom)) + 22px);
       }
 
       .hint.hidden {
@@ -395,6 +395,16 @@
       width: 38px;
       height: 38px;
       border-color: rgba(36, 31, 25, 0.55);
+    }
+
+    /* Melt 手法：水滴形游標（上尖下圓的泪滴輪廓，尖角朝上） */
+    .brush-cursor.drip {
+      width: 38px;
+      height: 38px;
+      border: 1.5px solid rgba(255, 255, 255, 0.9);
+      border-radius: 0 50% 50% 50%;
+      transform: translate(-50%, -58%) rotate(45deg);
+      box-shadow: 0 0 0 1px rgba(36, 31, 25, 0.28);
     }
 
     .credit {
