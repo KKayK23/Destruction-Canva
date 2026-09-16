@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>破壞藝術 Destruction Canva</title>
+  <link rel="stylesheet" href="src/styles/main.css">
+</head>
+<body>
+  <canvas id="artwork" aria-label="可用滑鼠推動顏料的互動畫作"></canvas>
+  <header class="brand" aria-label="破壞藝術 Destruction Canva">
+    <span class="brand-zh">破壞藝術</span>
+    <span class="brand-en">Destruction Canva</span>
+  </header>
+  <nav class="modes" aria-label="破壞手法切換">
+    <button class="mode active" id="modeSmear" type="button" aria-pressed="true">抹開 <span>Smear</span></button>
+    <button class="mode" id="modeRGBSplit" type="button" aria-pressed="false">色差 <span>RGB Split</span></button>
+    <button class="mode" id="modeGlitch" type="button" aria-pressed="false">數位 <span>Glitch</span></button>
+    <button class="mode" id="modeMelt" type="button" aria-pressed="false">融化 <span>Melt</span></button>
+  </nav>
+  <p class="hint" id="hint">移動或長按，攪動畫面</p>
+  <input type="file" id="uploadInput" accept="image/*" hidden>
+  <button class="upload" id="upload" type="button" aria-label="上傳圖片" title="上傳圖片（也可拖放或貼上）">
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M12 14V4"></path>
+      <path d="m8 8 4-4 4 4"></path>
+      <path d="M4 16v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"></path>
+    </svg>
+  </button>
+  <button class="export" id="export" type="button" aria-label="匯出畫作" title="匯出畫作" aria-haspopup="menu" aria-expanded="false">
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M12 4v11"></path>
+      <path d="m7 11 5 5 5-5"></path>
+      <path d="M5 20h14"></path>
+    </svg>
+  </button>
+  <div class="export-menu" id="exportMenu" role="menu" aria-label="選擇匯出格式">
+    <button type="button" role="menuitem" data-format="png">PNG <span>無損</span></button>
+    <button type="button" role="menuitem" data-format="jpg">JPG <span>檔案較小</span></button>
+  </div>
+  <button class="reset" id="reset" type="button" aria-label="重置畫作" title="重置畫作">
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M3 12a9 9 0 1 0 3-6.7L3 8"></path>
+      <path d="M3 3v5h5"></path>
+    </svg>
+  </button>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <div class="drop-overlay" id="dropOverlay" aria-hidden="true">放開滑鼠，載入圖片</div>
+  <footer class="credit" aria-hidden="true">Created by Kay Liang</footer>
+  <span class="brush-cursor" id="brushCursor" aria-hidden="true"></span>
+
+  <script type="module" src="src/js/main.js"></script>
+</body>
+</html>

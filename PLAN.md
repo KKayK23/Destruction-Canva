@@ -49,12 +49,27 @@
 
 ## 4. 技術方案
 
-### 檔案結構
+### 檔案結構（2026-09-16 工程化重構）
 
-- 互動成品集中在一個 `畫作顔色亂混.html`，並載入同資料夾的畫作圖片。
-- HTML、CSS 和 JavaScript 全部寫在同一檔案內。
-- 不使用框架、套件、CDN 或遠端素材。
-- 可離線直接開啟使用。
+- 入口為 `index.html`（只含 HTML 結構），載入同資料夾的畫作圖片與模組化資源。
+- 樣式集中在 `src/styles/main.css`。
+- JavaScript 使用原生 ES Modules，不使用框架、套件、CDN 或遠端素材：
+
+```
+src/js/
+  canvases.js      ← DOM/canvas/context 實例集中管理
+  state.js         ← 可變狀態（模式、游標、視圖、各手法狀態）
+  display.js       ← 版面縮放、重置、白邊裁切
+  ui.js            ← toast、匯出、上傳/拖放/貼上、手法切換
+  main.js          ← 進入點：事件綁定、動畫迴圈、啟動
+  effects/
+    smear.js       ← 抹開 + 旋渦
+    glitch.js      ← RGB Split + 點擊爆發
+    melt.js        ← 融化水流
+```
+
+- 舊的單檔 `畫作顔色亂混.html` 保留作為歷史參考，不再維護。
+- 因使用 ES Modules，需透過本機 HTTP server 開啟（不能 file:// 直接開）。
 
 ### Canvas 實作
 
