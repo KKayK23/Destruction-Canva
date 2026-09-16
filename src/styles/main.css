@@ -223,6 +223,44 @@
       stroke-width: 1.8;
     }
 
+    /* 默認畫作切換：左下角圓形按鈕，樣式與右上工具列一致 */
+    .default-art {
+      position: fixed;
+      left: max(18px, env(safe-area-inset-left));
+      bottom: max(18px, env(safe-area-inset-bottom));
+      z-index: 3;
+      display: grid;
+      width: 42px;
+      height: 42px;
+      padding: 0;
+      place-items: center;
+      color: var(--ink);
+      background: rgba(255, 255, 255, 0.88);
+      border: 1px solid var(--line);
+      border-radius: 50%;
+      cursor: pointer;
+      backdrop-filter: blur(8px);
+    }
+
+    .default-art:hover {
+      background: #fff;
+    }
+
+    .default-art:focus-visible {
+      outline: 2px solid var(--ink);
+      outline-offset: 3px;
+    }
+
+    .default-art svg {
+      width: 19px;
+      height: 19px;
+      fill: none;
+      stroke: currentColor;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-width: 1.8;
+    }
+
     .drop-overlay {
       position: fixed;
       inset: 14px;

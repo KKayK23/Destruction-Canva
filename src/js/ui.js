@@ -1,5 +1,5 @@
 // 介面互動：提示訊息、匯出、上傳（按鈕 / 拖放 / 貼上）、手法切換。
-import { canvas, context, hint, exportButton, exportMenu, uploadButton, uploadInput, dropOverlay, toast, sourceImage, modeButtons, brushCursor } from "./canvases.js";
+import { canvas, context, hint, exportButton, exportMenu, uploadButton, uploadInput, dropOverlay, toast, sourceImage, modeButtons, brushCursor, defaultArtButton } from "./canvases.js";
 import { view, session, glitchState, MODE_HINTS } from "./state.js";
 import { resizeCanvas, computeSourceRect } from "./display.js";
 
@@ -89,6 +89,10 @@ export function handleSourceLoad() {
     pendingObjectUrl = null;
     view.sourceRect = computeSourceRect(sourceImage);
     showToast("已載入圖片");
+  } else {
+    // 默認畫作載入：上傳圖可能改寫過 sourceRect（自動裁切範圍），
+    // 必須還原默認圖的裁切常數，否則默認畫作會以上傳圖的比例顯示而變形/變小。
+    view.sourceRect = { x: 170, y: 82, width: 682, height: 840 };
   }
   resizeCanvas();
 }
@@ -114,6 +118,19 @@ export function loadUserImage(file) {
 }
 
 uploadButton.addEventListener("click", () => uploadInput.click());
+
+// 默認畫作：點擊切回預設圖片「克羅姆-吻」（上傳或貼上其他圖後可按這裡換回來）。
+defaultArtButton.addEventListener("click", () => {
+  if (sourceImage.src.endsWith(encodeURI("克羅姆-吻.jpg")) && !sourceImage.src.startsWith("blob:")) {
+    showToast("目前已是默認畫作");
+    return;
+  }
+  if (pendingObjectUrl) {
+    URL.revokeObjectURL(pendingObjectUrl);
+    pendingObjectUrl = null;
+  }
+  sourceImage.src = "克羅姆-吻.jpg";
+});
 
 uploadInput.addEventListener("change", () => {
   loadUserImage(uploadInput.files && uploadInput.files[0]);

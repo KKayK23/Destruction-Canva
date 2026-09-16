@@ -3,6 +3,7 @@ export const canvas = document.querySelector("#artwork");
 export const context = canvas.getContext("2d", { alpha: false });
 export const hint = document.querySelector("#hint");
 export const resetButton = document.querySelector("#reset");
+export const defaultArtButton = document.querySelector("#defaultArt");
 export const brushCursor = document.querySelector("#brushCursor");
 export const exportButton = document.querySelector("#export");
 export const exportMenu = document.querySelector("#exportMenu");
