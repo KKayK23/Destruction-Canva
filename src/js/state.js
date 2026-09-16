@@ -29,15 +29,11 @@ export const MODE_HINTS = {
   smear: "移動滑鼠，攪動畫面",
   rgbsplit: "掃過畫面，拉出色差",
   glitch: "點擊畫面，隨機數位損壞",
-  melt: "長按畫面，顏料融化滴落"
+  melt: "按住滑動，顏料融化滴落"
 };
-// Melt 手法：融化緩衝與節流
+// Melt 手法：滑動水流狀態
 export const meltState = {
-  canvas: document.createElement("canvas"),
-  source: document.createElement("canvas"),
-  drip: { active: false, tipY: 0, x: 0, y: 0 },
-  lastFrame: 0,
-  pressStart: 0
+  // 滑動時沿途產生的獨立小水流：各自隨機速度、隨機流動長度
+  trailDrips: [],
+  gapSinceDrip: 0
 };
-export const meltContext = meltState.canvas.getContext("2d", { willReadFrequently: true });
-export const meltSourceContext = meltState.source.getContext("2d");

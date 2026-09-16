@@ -28,3 +28,6 @@ export const glitchCanvas = document.createElement("canvas");
 export const glitchContext = glitchCanvas.getContext("2d", { willReadFrequently: true });
 export const trimCanvas = document.createElement("canvas");
 export const trimContext = trimCanvas.getContext("2d", { willReadFrequently: true });
+// Melt 手法：水流批次繪製緩衝（先畫所有水流再一次性 blur 合成，避免逐個 filter 造成卡頓）
+export const meltBufferCanvas = document.createElement("canvas");
+export const meltBufferContext = meltBufferCanvas.getContext("2d");
