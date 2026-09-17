@@ -445,6 +445,18 @@
       box-shadow: 0 0 0 1px rgba(36, 31, 25, 0.28);
     }
 
+    /* Tear 手法：鋸齒狀撕紙游標 */
+    .brush-cursor.tear {
+      width: 34px;
+      height: 34px;
+      border: none;
+      border-radius: 0;
+      box-shadow: none;
+      background:
+        linear-gradient(135deg, transparent 46%, rgba(36, 31, 25, 0.65) 46%, rgba(36, 31, 25, 0.65) 54%, transparent 54%),
+        linear-gradient(45deg, transparent 46%, rgba(36, 31, 25, 0.65) 46%, rgba(36, 31, 25, 0.65) 54%, transparent 54%);
+    }
+
     .credit {
       position: fixed;
       right: max(20px, env(safe-area-inset-right));

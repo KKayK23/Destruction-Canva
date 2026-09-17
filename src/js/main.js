@@ -6,6 +6,7 @@ import { mixPaint, swirlPaint } from "./effects/smear.js";
 import { applyGlitchBurst, processGlitchQueue, pushGlitchTrail } from "./effects/glitch.js";
 import { spawnTrailDrip, updateTrailDrips } from "./effects/melt.js";
 import { placeSticker } from "./effects/sticker.js";
+import { startTear, extendTear, endTear, clearTears } from "./effects/tear.js";
 import { setMode, handleSourceLoad, handleSourceError } from "./ui.js";
 export function animateVortex(time) {
   processGlitchQueue();
@@ -43,8 +44,7 @@ function movePointer(event) {
     pointer.longPressEligible = false;
   }
 
-  if (session.activeMode === "glitch" || session.activeMode === "melt" || session.activeMode === "sticker") {
-    // Glitch 只在點擊時觸發；Melt 長按流動——移動時沿路徑隨機留下小水流
+  if (session.activeMode === "glitch" || session.activeMode === "melt" || session.activeMode === "sticker" || session.activeMode === "tear") {
     if (session.activeMode === "melt" && pointer.down && distance > 0) {
       // 沿移動路徑撒水流：純機率隨機生成，但加上「最長空窗」保底——
       // 路徑上超過一定距離沒有水流時，強制補一條，避免長路徑出現大段空白
@@ -59,6 +59,10 @@ function movePointer(event) {
           meltState.gapSinceDrip = 0;
         }
       }
+    }
+    // Tear：按住移動時，滑鼠軌跡就是撕裂路徑；停止移動撕裂立即停止
+    if (session.activeMode === "tear" && pointer.down && distance > 0) {
+      extendTear(currentX, currentY);
     }
     pointer.x = currentX;
     pointer.y = currentY;
@@ -138,15 +142,21 @@ canvas.addEventListener("pointerdown", (event) => {
   if (session.activeMode === "sticker" && isInsideArtwork(event.clientX, event.clientY)) {
     placeSticker(event.clientX, event.clientY);
   }
+  // Tear：按下處開始新的撕裂（快照目前畫面作為撕紙來源）
+  if (session.activeMode === "tear" && isInsideArtwork(event.clientX, event.clientY)) {
+    startTear(event.clientX, event.clientY);
+  }
 });
 canvas.addEventListener("pointerup", (event) => {
   pointer.down = false;
   pointer.longPressEligible = false;
+  endTear();
   if (canvas.hasPointerCapture(event.pointerId)) canvas.releasePointerCapture(event.pointerId);
 });
 canvas.addEventListener("pointercancel", () => {
   pointer.down = false;
   pointer.longPressEligible = false;
+  endTear();
 });
 canvas.addEventListener("contextmenu", (event) => event.preventDefault());
 resetButton.addEventListener("click", resetArtwork);

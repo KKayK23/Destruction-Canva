@@ -31,11 +31,17 @@ export const MODE_HINTS = {
   rgbsplit: "掃過畫面，拉出色差",
   glitch: "點擊畫面，隨機數位損壞",
   melt: "按住滑動，顏料融化滴落",
-  sticker: "點擊畫面，貼上笑臉貼紙"
+  sticker: "點擊畫面，貼上笑臉貼紙",
+  tear: "按住滑動，沿路徑撕開畫作"
 };
 // Melt 手法：滑動水流狀態
 export const meltState = {
   // 滑動時沿途產生的獨立小水流：各自隨機速度、隨機流動長度
   trailDrips: [],
   gapSinceDrip: 0
+};
+// Tear 手法：撕裂路徑（滑鼠軌跡）與兩半分離距離
+export const tearState = {
+  strokes: [],
+  current: null
 };

@@ -19,6 +19,7 @@ export function setMode(mode) {
   });
   brushCursor.classList.toggle("glitch", mode === "glitch" || mode === "rgbsplit");
   brushCursor.classList.toggle("drip", mode === "melt");
+  brushCursor.classList.toggle("tear", mode === "tear");
   glitchState.trail.hasPoint = false;
 
   // 引導文字：每次切換手法都重新顯示，先淡出 → 換文字 → 再淡入，停留後自動淡出
@@ -165,8 +166,5 @@ window.addEventListener("paste", (event) => {
   const item = items && Array.from(items).find((entry) => entry.type.startsWith("image/"));
   if (item) loadUserImage(item.getAsFile());
 });
-modeButtons.smear.addEventListener("click", () => setMode("smear"));
-modeButtons.glitch.addEventListener("click", () => setMode("glitch"));
-modeButtons.rgbsplit.addEventListener("click", () => setMode("rgbsplit"));
-modeButtons.melt.addEventListener("click", () => setMode("melt"));
 modeButtons.sticker.addEventListener("click", () => setMode("sticker"));
+modeButtons.tear.addEventListener("click", () => setMode("tear"));

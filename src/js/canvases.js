@@ -16,7 +16,8 @@ export const modeButtons = {
   glitch: document.querySelector("#modeGlitch"),
   rgbsplit: document.querySelector("#modeRGBSplit"),
   melt: document.querySelector("#modeMelt"),
-  sticker: document.querySelector("#modeSticker")
+  sticker: document.querySelector("#modeSticker"),
+  tear: document.querySelector("#modeTear")
 };
 
 export const sourceImage = new Image();
@@ -33,3 +34,6 @@ export const trimContext = trimCanvas.getContext("2d", { willReadFrequently: tru
 // Melt 手法：水流批次繪製緩衝（先畫所有水流再一次性 blur 合成，避免逐個 filter 造成卡頓）
 export const meltBufferCanvas = document.createElement("canvas");
 export const meltBufferContext = meltBufferCanvas.getContext("2d");
+// Tear 手法：撕裂時的畫面快照（撕紙來源，含其他手法與先前撕裂的痕跡）
+export const tearSourceCanvas = document.createElement("canvas");
+export const tearSourceContext = tearSourceCanvas.getContext("2d");

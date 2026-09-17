@@ -1,6 +1,7 @@
 // 版面與顯示：畫作定位、縮放、重置、白邊裁切估計。
 import { canvas, context, originalCanvas, originalContext, trimCanvas, trimContext, sourceImage, hint } from "./canvases.js";
 import { pointer, view, session, glitchState } from "./state.js";
+import { clearTears } from "./effects/tear.js";
 
 export function fitArtwork() {
   const viewportWidth = window.innerWidth;
@@ -61,6 +62,7 @@ export function resetArtwork() {
   glitchState.queue.length = 0;
   glitchState.trail.hasPoint = false;
   glitchState.energy = 0;
+  clearTears();
   session.hasInteracted = false;
   hint.classList.remove("hidden");
 }

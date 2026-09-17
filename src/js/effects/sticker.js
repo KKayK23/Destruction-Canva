@@ -122,23 +122,32 @@ function getStickerSprite(image) {
   return spriteCache.get(image.src);
 }
 
-// 隨機挑圖：加權抽選——每張圖出現過就越來越難再被選中，
-// 避免同一張洗版，同時保留隨機感（不是死板的輪流）；另保證不與上一張相同。
-// 注意：圖片是非同步載入，不能用載入時的 stickers 長度初始化計數表，
-// 改用 Map（查不到視為 0）才不會算出 NaN 導致永遠選中同一張。
-const stickerCounts = new Map();
+// 隨機輪流挑圖（shuffled deck）：把所有圖案洗牌成一輪的順序，依序出完；
+// 一輪內同一張不會重複，一輪結束後重新洗牌開始下一輪。
+// 每輪順序都隨機，所以相鄰兩輪的銜接處也不會出現同一張連續兩次
+// （洗牌時若新輪第一張與上一輪最後一張相同，就與輪內另一張交換）。
+let deck = [];
+let deckPosition = 0;
 let lastStickerIndex = -1;
-function pickStickerIndex() {
-  const weights = stickers.map((_, index) =>
-    index === lastStickerIndex ? 0 : 1 / (1 + (stickerCounts.get(index) || 0))
-  );
-  const total = weights.reduce((sum, weight) => sum + weight, 0);
-  let roll = Math.random() * total;
-  for (let index = 0; index < weights.length; index += 1) {
-    roll -= weights[index];
-    if (roll <= 0) return index;
+function shuffleDeck() {
+  deck = stickers.map((_, index) => index);
+  for (let index = deck.length - 1; index > 0; index -= 1) {
+    const swap = Math.floor(Math.random() * (index + 1));
+    [deck[index], deck[swap]] = [deck[swap], deck[index]];
   }
-  return weights.length - 1;
+  // 避免跨輪重複：新輪第一張若與上一輪最後一張相同，換到後面某張
+  if (deck.length > 1 && deck[0] === lastStickerIndex) {
+    const swap = 1 + Math.floor(Math.random() * (deck.length - 1));
+    [deck[0], deck[swap]] = [deck[swap], deck[0]];
+  }
+  deckPosition = 0;
+}
+function pickStickerIndex() {
+  if (deckPosition >= deck.length) shuffleDeck();
+  const index = deck[deckPosition];
+  deckPosition += 1;
+  lastStickerIndex = index;
+  return index;
 }
 
 // 在點擊處貼上一張隨機貼紙：隨機挑圖、隨機大小與旋轉，
@@ -146,8 +155,6 @@ function pickStickerIndex() {
 export function placeSticker(x, y) {
   if (!stickers.length || !isInsideArtwork(x, y)) return;
   const stickerIndex = pickStickerIndex();
-  stickerCounts.set(stickerIndex, (stickerCounts.get(stickerIndex) || 0) + 1);
-  lastStickerIndex = stickerIndex;
   const image = stickers[stickerIndex];
   const sprite = getStickerSprite(image);
 
